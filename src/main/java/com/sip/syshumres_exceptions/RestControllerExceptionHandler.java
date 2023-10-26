@@ -1,5 +1,7 @@
 package com.sip.syshumres_exceptions;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +48,14 @@ public class RestControllerExceptionHandler {
 	    String description = String.format("El archivo debe ser menor a '%s' bytes", this.maxFileSize);
 	    MaxUploadSizeExceededCustomException  exCustom = new MaxUploadSizeExceededCustomException(description);
 	    
+	    return new ErrorMessage(exCustom, "");
+    }
+	
+	//When uploap file fails
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(IOException.class)
+    public ErrorMessage handleIOException(IOException ex){
+		UploadFileException exCustom = new UploadFileException(ex.getMessage());
 	    return new ErrorMessage(exCustom, "");
     }
 	
