@@ -71,7 +71,7 @@ public class RestControllerExceptionHandler {
     	ProspectFieldsAlreadyExistException.class, CreateEmployeeProfileException.class, FatherAssignException.class,
     	UploadFormatsAllowException.class, CreateRegisterException.class, SendEmailException.class, UrlInvalidException.class, 
     	InvalidFieldException.class, ChangePasswordException.class, UploadFileException.class, UnknownOptionException.class, 
-    	MalFormedHeaderException.class})
+    	MalFormedHeaderException.class, InvalidIdException.class})
     @ResponseBody
     public ErrorMessage badRequest(Exception ex) {
 	    return new ErrorMessage(ex, "");
