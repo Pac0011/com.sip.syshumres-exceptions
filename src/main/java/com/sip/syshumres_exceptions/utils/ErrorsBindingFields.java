@@ -15,8 +15,8 @@ import org.springframework.validation.BindingResult;
  */
 public class ErrorsBindingFields {
 	
-	public static  ResponseEntity<?> validate(BindingResult result) {
-		Map<String, Object> errors = new HashMap<>();
+	public static  ResponseEntity<Map<String, String>> validate(BindingResult result) {
+		Map<String, String> errors = new HashMap<>();
 		result.getFieldErrors().forEach(err -> {
 			String field = err.getField();
 			//Se coloca \\. para que no lo interprete como un regrex
