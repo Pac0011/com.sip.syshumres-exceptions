@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
@@ -34,11 +33,22 @@ public class RestControllerExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ErrorMessage handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-	    String description = String.format("'%s' debe ser '%s' y no '%s'", 
-	    		ex.getName(), ex.getRequiredType().getSimpleName(), ex.getValue());
-	    MethodArgumentTypeMismatchCustomException exCustom = new MethodArgumentTypeMismatchCustomException(description);
-	    
-	    return new ErrorMessage(exCustom, "");
+		
+		if (ex.getRequiredType() != null) {
+			try {
+				String simpleName = ex.getRequiredType().getSimpleName();
+				if (simpleName != null) {
+					String description = String.format("'%s' debe ser '%s' y no '%s'", 
+				    		ex.getName(), simpleName, ex.getValue());
+				    MethodArgumentTypeMismatchCustomException exCustom2 = 
+				    		new MethodArgumentTypeMismatchCustomException(description);
+				    return new ErrorMessage(exCustom2, "");
+				}
+			} catch (NullPointerException e) {
+				return new ErrorMessage(new MethodArgumentTypeMismatchCustomException(), "");
+			}
+		}
+        return new ErrorMessage(new MethodArgumentTypeMismatchCustomException(), "");
 	}
 	
 	//When uploap file exceeds the limit
@@ -86,31 +96,5 @@ public class RestControllerExceptionHandler {
     public ErrorMessage badRequest(Exception ex) {
 	    return new ErrorMessage(ex, "");
     }
-    
-    //{ForbiddenException.class
-    /*@ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({org.springframework.security.access.AccessDeniedException.class})
-    @ResponseBody
-    public ErrorMessage forbiddenRequest(Exception ex) {
-    	return new ErrorMessage(ex, "");
-    }*/
-    
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({UnauthorizedException.class})
-    public void unauthorizedRequest(Exception ex) {
-    }
-    
-    //@ResponseStatus(HttpStatus.BAD_GATEWAY)
-    //@ExceptionHandler({BadGatewayException.class})
-    //public void badGateway(Exception ex) {
-        //return new ErrorMessage(ex, HttpStatus.BAD_GATEWAY.toString());
-    //}
-    
-    //@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    //@ExceptionHandler({Exception.class})
-    //public ErrorMessage exception(Exception ex) {
-    //	ex.printStackTrace();//No Production
-    	//return new ErrorMessage(ex, HttpStatus.INTERNAL_SERVER_ERROR.toString());
-    //}
 
 }
